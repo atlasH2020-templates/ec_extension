@@ -1,0 +1,411 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "ec_extension API",
+    "description": "API specification for the equipment centre extension service template",
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/capabilities": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Retrieve capabilities (get_capabilities)",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                },
+                "example": {
+                  "task_types": [
+                    ""
+                  ],
+                  "app": {
+                    "apk_download_url": "https://acme.com/my_fertilization_extension",
+                    "apk_checksum": "786a38b77804e5e2797540025154cec03d4b0e68ca99c39f847afb751325addb",
+                    "permissions": {
+                      "required": [],
+                      "optional": []
+                    },
+                    "mandatory": true
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailedError"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailedError"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/can_process_task": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Determine if the task is processable by this extension (can_process_task)",
+        "responses": {
+          "201": {
+            "description": "The task can be processed",
+            "content": {
+            }
+          },
+          "204": {
+            "description": "The task does not apply, skip processing"
+          },
+          "401": {
+            "description": "Invalid or missing credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailedError"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Impossible to process task, skip processing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailedError"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailedError"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pre_process_map": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Pre-process application map (pre_process_map)",
+        "requestBody": {
+          "description": "application map",
+          "content": {
+            "application/geopackage+sqlite3": {
+              "schema": {
+                "type": "string",
+                "format": "byte",
+                "description": "Application map",
+                "example": "<base64 encoded GeoPackage>"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/geopackage+sqlite3": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte",
+                  "description": "Original or modified application map",
+                  "example": "<base64 encoded GeoPackage>"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailedError"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailedError"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post_process_results/{field_urn}": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Post-process the resulting as applied map (post_process_results)",
+        "parameters": [
+          {
+            "name": "field_urn",
+            "description": "the URN (urn:<service_id>:<internal_id>) of a field",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/URN"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "application map",
+          "content": {
+            "application/geopackage+sqlite3": {
+              "schema": {
+                "type": "string",
+                "format": "byte",
+                "description": "As applied map",
+                "example": "<base64 encoded GeoPackage>"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/geopackage+sqlite3": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte",
+                  "description": "Original or modified as applied map",
+                  "example": "<base64 encoded GeoPackage>"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Must not record as applied to field_data"
+          },
+          "401": {
+            "description": "Invalid or missing credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailedError"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailedError"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Capabilities": {
+        "type": "object",
+        "properties": {
+          "task_types": {
+            "$ref": "#/components/schemas/TaskTypes",
+            "description": "The task types that are processable by this extension"
+          },
+          "app": {
+            "description": "An optional companion app that can run on an AppEngine",
+            "type": "object",
+            "properties": {
+              "mandatory": {
+                "description": "If true, the extension will only work for tasks on AppEngine where the user approved download",
+                "type": "boolean"
+              },
+              "apk_name": {
+                "type": "string"
+              },
+              "apk_download_url": {
+                "type": "string",
+                "format": "uri",
+                "description": "url where the apk can be downloaded"
+              },
+              "apk_checksum": {
+                "type": "string",
+                "format": "uri"
+              },
+              "permissions": {
+                "type": "object",
+                "properties": {
+                  "required": {
+                    "description": "Minimal permissions that must be granted for the app to function",
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Permissions"
+                    }
+                  },
+                  "optional": {
+                    "description": "Additional permissions that the user may grant during the usage of the app",
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Permissions"
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "apk_name",
+              "apk_download_url",
+              "apk_checksum"
+            ]
+          }
+        }
+      },
+      "TaskTypes": {
+        "type": "string",
+        "enum": [
+          "fertilization",
+          "irrigation",
+          "crop_protection",
+          "harvesting",
+          "sowing",
+          "other"
+        ]
+      },
+      "Permissions": {
+        "type": "string",
+        "enum": [
+          "to_be_defined"
+        ]
+      },
+      "URN": {
+        "type": "string",
+        "pattern": "^urn:[a-z][a-z0-9_.\\-]*:[\\w-.]+",
+        "description": "Uniform resource name with the syntax `urn:<service_id>:<internal_id>`. <service_id> must be the id of a valid and active ATLAS service"
+      },
+      "SimpleError": {
+        "type": "string",
+        "description": "Plain text message (may be empty).",
+        "example": "optional error message"
+      },
+      "DetailedError": {
+        "type": "object",
+        "description": "This defines the structure of an error payload when one is present. Actual messages and additional error information content may change from one implementation to another",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "error description"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Additional detailed information"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "example": {
+          "message": "general error message",
+          "errors": [
+            "optional",
+            "additional",
+            "details"
+          ]
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-# equipment_center_extension
+# ec_extension
 
 
 
