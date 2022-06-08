@@ -3,7 +3,7 @@
   "info": {
     "title": "ec_extension API",
     "description": "API specification for the equipment centre extension service template",
-    "version": "0.0.1"
+    "version": "0.1.0"
   },
   "paths": {
     "/capabilities": {
