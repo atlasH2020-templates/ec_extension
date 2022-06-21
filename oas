@@ -27,7 +27,7 @@
                     ""
                   ],
                   "app": {
-                    "apk_download_url": "https://acme.com/my_fertilization_extension",
+                    "apk_download_url": "https://acme.com/my_fertilisation_extension",
                     "apk_checksum": "786a38b77804e5e2797540025154cec03d4b0e68ca99c39f847afb751325addb",
                     "permissions": {
                       "required": [],
@@ -348,7 +348,7 @@
       "TaskTypes": {
         "type": "string",
         "enum": [
-          "fertilization",
+          "fertilisation",
           "irrigation",
           "crop_protection",
           "harvesting",
