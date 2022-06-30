@@ -6,34 +6,36 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/capabilities": {
+    "/processing_info": {
       "get": {
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "Retrieve capabilities (get_capabilities)",
+        "summary": "Retrieve processing information (get_processing_info)",
         "responses": {
           "200": {
             "description": "successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Capabilities"
+                  "$ref": "#/components/schemas/ProcessingInfo"
                 },
                 "example": {
                   "task_types": [
-                    ""
+                    "fertilisation",
+                    "crop_protection"
+                  ],
+                  "equipment_types": [
+                    "AppEngine"
                   ],
                   "app": {
-                    "apk_download_url": "https://acme.com/my_fertilisation_extension",
-                    "apk_checksum": "786a38b77804e5e2797540025154cec03d4b0e68ca99c39f847afb751325addb",
-                    "permissions": {
-                      "required": [],
-                      "optional": []
-                    },
-                    "mandatory": true
+                    "mandatory": false,
+                    "download_url": "https://acme.com/my_fertilisation_app",
+                    "checksum": "786a38b77804e5e2797540025154cec03d4b0e68ca99c39f847afb751325addb",
+                    "required_permission": [],
+                    "optional_permissions": []
                   }
                 }
               }
@@ -72,88 +74,27 @@
         }
       }
     },
-    "/can_process_task": {
+    "/pre_process": {
       "post": {
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "Determine if the task is processable by this extension (can_process_task)",
-        "responses": {
-          "201": {
-            "description": "The task can be processed",
-            "content": {
-            }
-          },
-          "204": {
-            "description": "The task does not apply, skip processing"
-          },
-          "401": {
-            "description": "Invalid or missing credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Impossible to process task, skip processing",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/pre_process_map": {
-      "post": {
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Pre-process application map (pre_process_map)",
+        "summary": "Pre-process (pre_process)",
         "requestBody": {
-          "description": "application map",
           "content": {
-            "application/geopackage+sqlite3": {
+            "multipart/form-data": {
               "schema": {
-                "type": "string",
-                "format": "byte",
-                "description": "Application map",
-                "example": "<base64 encoded GeoPackage>"
+                "type": "object",
+                "properties": {
+                  "advice": {
+                    "$ref": "#/components/schemas/Advice"
+                  },
+                  "gpkg": {
+                    "$ref": "#/components/schemas/GeoPackage"
+                  }
+                }
               }
             }
           }
@@ -164,13 +105,13 @@
             "content": {
               "application/geopackage+sqlite3": {
                 "schema": {
-                  "type": "string",
-                  "format": "byte",
-                  "description": "Original or modified application map",
-                  "example": "<base64 encoded GeoPackage>"
+                  "$ref": "#/components/schemas/GeoPackage"
                 }
               }
             }
+          },
+          "204": {
+            "description": "no modification to gpkg needed"
           },
           "401": {
             "description": "Invalid or missing credentials",
@@ -205,34 +146,27 @@
         }
       }
     },
-    "/post_process_results/{field_urn}": {
+    "/post_process": {
       "post": {
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "Post-process the resulting as applied map (post_process_results)",
-        "parameters": [
-          {
-            "name": "field_urn",
-            "description": "the URN (urn:<service_id>:<internal_id>) of a field",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/URN"
-            }
-          }
-        ],
+        "summary": "Post-process the resulting as applied map (post_process)",
         "requestBody": {
-          "description": "application map",
           "content": {
-            "application/geopackage+sqlite3": {
+            "multipart/form-data": {
               "schema": {
-                "type": "string",
-                "format": "byte",
-                "description": "As applied map",
-                "example": "<base64 encoded GeoPackage>"
+                "type": "object",
+                "properties": {
+                  "advice": {
+                    "$ref": "#/components/schemas/Advice"
+                  },
+                  "gpkg": {
+                    "$ref": "#/components/schemas/GeoPackage"
+                  }
+                }
               }
             }
           }
@@ -243,16 +177,13 @@
             "content": {
               "application/geopackage+sqlite3": {
                 "schema": {
-                  "type": "string",
-                  "format": "byte",
-                  "description": "Original or modified as applied map",
-                  "example": "<base64 encoded GeoPackage>"
+                  "$ref": "#/components/schemas/GeoPackage"
                 }
               }
             }
           },
           "204": {
-            "description": "Must not record as applied to field_data"
+            "description": "no modification to gpkg needed"
           },
           "401": {
             "description": "Invalid or missing credentials",
@@ -290,12 +221,22 @@
   },
   "components": {
     "schemas": {
-      "Capabilities": {
+      "ProcessingInfo": {
         "type": "object",
         "properties": {
           "task_types": {
-            "$ref": "#/components/schemas/TaskTypes",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskType"
+            },
             "description": "The task types that are processable by this extension"
+          },
+          "equipment_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentType"
+            },
+            "description": "The equipment types that are processable by this extension"
           },
           "app": {
             "description": "An optional companion app that can run on an AppEngine",
@@ -345,7 +286,41 @@
           }
         }
       },
-      "TaskTypes": {
+      "Advice": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/TaskType"
+          },
+          "advice_urn": {
+            "$ref": "#/components/schemas/AdviceURN"
+          },
+          "field_urn": {
+            "$ref": "#/components/schemas/FieldURN"
+          },
+          "application_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "application_refs being processed (if applicable)"
+          },
+          "applications": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "task-type dependent. See corresponding advisor service for specs"
+          }
+        },
+        "description": "advice (json) being processed (see Advice object)"
+      },
+      "GeoPackage": {
+        "type": "string",
+        "format": "binary",
+        "description": "base64 encoded GeoPackage (application/geopackage+sqlite3)"
+      },
+      "TaskType": {
         "type": "string",
         "enum": [
           "fertilisation",
@@ -356,16 +331,29 @@
           "other"
         ]
       },
+      "EquipmentType": {
+        "type": "string",
+        "enum": [
+          "ISOBUS",
+          "AppEngine",
+          "other"
+        ]
+      },
       "Permissions": {
         "type": "string",
         "enum": [
           "to_be_defined"
         ]
       },
-      "URN": {
+      "FieldURN": {
         "type": "string",
         "pattern": "^urn:[a-z][a-z0-9_.\\-]*:[\\w-.]+",
-        "description": "Uniform resource name with the syntax `urn:<service_id>:<internal_id>`. <service_id> must be the id of a valid and active ATLAS service"
+        "description": "Uniform resource name of a field with the syntax `urn:<service_id>:<internal_id>`. <service_id> must be the id of a valid and active ATLAS service"
+      },
+      "AdviceURN": {
+        "type": "string",
+        "pattern": "^urn:[a-z][a-z0-9_.\\-]*:[\\w-.]+",
+        "description": "Uniform resource name of an advice with the syntax `urn:<service_id>:<internal_id>`. <service_id> must be the id of a valid and active ATLAS service"
       },
       "SimpleError": {
         "type": "string",
