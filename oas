@@ -6,21 +6,21 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/processing_info": {
+    "/get_processing_capabilities": {
       "get": {
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "Retrieve processing information (get_processing_info)",
+        "summary": "Retrieve processing capabilities (get_processing_capabilities)",
         "responses": {
           "200": {
             "description": "successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProcessingInfo"
+                  "$ref": "#/components/schemas/ProcessingCapabilities"
                 },
                 "example": {
                   "task_types": [
@@ -221,7 +221,7 @@
   },
   "components": {
     "schemas": {
-      "ProcessingInfo": {
+      "ProcessingCapabilities": {
         "type": "object",
         "properties": {
           "task_types": {

@@ -12,8 +12,7 @@
 <div class="header">
 ATLAS Service Template Specification
 Name                                                 ec_extension
-Version                                                     0.0.1
-Status                                                      DRAFT
+Version                                                     0.1.0
 Author(s)                            M. Caballero (AgriCircle AG)
 </div>
 
@@ -64,9 +63,8 @@ The ATLAS AppEngine technology enables the integration on the tractor side, and 
 This section provides a very high-level summary of the ec_extension API:
 <pre>
 Configuration Endpoints
-    Get Capabilities
-Task Management Endpoints
-    Is Task Processable
+    Get Processing Capabilities
+Application Map Processing Endpoints
     Pre-process Application Map
     Post-process Application Result
 </pre>
@@ -87,60 +85,47 @@ ec_extension services are not required to handle intense traffic from a single c
 
 <h2>5.1 Configuration Endpoints</h2>
 
-<h2>5.1.1 Get Capabilities</h2>
+<h2>5.1.1 Get Processing Capabilities</h2>
 
-Via this function, the ec_service indicates which types of tasks it is able to process and provides information about an optional companion app (download url, permissions, ...)
+Via this function, the ec_service indicates which types of tasks it is able to process, for which type(s) of equipment, and provides information about an optional companion app (download url, permissions, ...)
 <pre>
 +--------------------------------------------+
-| get_capabilities                           |
+| get_processing_capabilities                |
 +-------------+------------------------------+
 |      Inputs | -                            |
 +-------------+------------------------------+
-|     Outputs | processable task types, app  |
+|     Outputs | processable equipment types, |
+|             | task types, app              |
 +-------------+------------------------------+
 </pre>
-<h2>5.2 Task Management Endpoints</h2>
+<h2>5.2 Application Map Processing Endpoints</h2>
 
-<h2>5.2.1 Is Task Processable</h2>
-
-The ATLAS Equipment Centre will determine that an ec_service is applicable for processing a task first based on the task types it supports, and second on the results of this endpoint
-<pre>
-+--------------------------------------------+
-| can_process_task                           |
-+-------------+------------------------------+
-|      Inputs | advice_urn                   |
-+-------------+------------------------------+
-|     Outputs | yes|no                       |
-+-------------+------------------------------+
-</pre>
-If the service indicates it cannot process the task, then the ATLAS Equipment Centre will continue processing the task with the default built-in behaviour. Otherwise, the endpoints described in the following sections will be invoked.
-
-<h2>5.2.2 Pre-process Application Map</h2>
+<h2>5.2.1 Pre-process Application Map</h2>
 
 Through this function, an ec_service has the opportunity of adding proprietary information to an application map that may be of use to its companion app running in an AppEngine.
 <pre>
 +--------------------------------------------+
-| pre_process_map                            |
+| pre_process                                |
 +-------------+------------------------------+
-|      Inputs | gpkg                         |
+|      Inputs | activity info, gpkg          |
 +-------------+------------------------------+
 |     Outputs | gpkg                         |
 +-------------+------------------------------+
 </pre>
-Even if no customization is performed, the service is expected to return the same application map it received.
+If no customization is performed, the service may return 204 to indicate that the application map is to remain unchanged.
 
-<h2>5.2.3 Post-process Application Results</h2>
-Through this function, an ec_service has the opportunity to extract proprietary information from an as applied map that may have been produced by its companion app running in an AppEngine.
+<h2>5.2.2 Post-process Application Results</h2>
+Through this function, an ec_service has the opportunity to transform incoming results (which may be in the form of an "activity log") into the standard as applied map expected by the field_data service, and/or to extract proprietary information that may have been produced by a the equipment (e.g. by companion app running in an AppEngine).
 <pre>
 +--------------------------------------------+
-| post_process_results                       |
+| post_process                               |
 +-------------+------------------------------+
-|      Inputs | field urn, gpkg              |
+|      Inputs | activity info, gpkg          |
 +-------------+------------------------------+
 |     Outputs | gpkg                         |
 +-------------+------------------------------+
 </pre>
-Even if no customization is performed, the service is expected to return the same application map it received.
+If no customization is performed, the service may return 204 to indicate that the application results map is to remain unchanged.
 
 <h2>6 Data Formats</h2>
 
