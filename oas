@@ -3,7 +3,11 @@
   "info": {
     "title": "ec_extension API",
     "description": "API specification for the equipment centre extension service template",
-    "version": "0.1.0"
+    "version": "0.0.1"
+  },
+  "externalDocs": {
+    "description": "Service Template Document",
+    "url": "https://htmlpreview.github.io/?https://github.com/atlasH2020-templates/ec_extension/blob/v0.0.1/doc.html"
   },
   "paths": {
     "/get_processing_capabilities": {
@@ -48,11 +52,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -62,11 +61,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -120,11 +114,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -134,11 +123,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -192,11 +176,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -206,11 +185,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -355,11 +329,6 @@
         "pattern": "^urn:[a-z][a-z0-9_.\\-]*:[\\w-.]+",
         "description": "Uniform resource name of an advice with the syntax `urn:<service_id>:<internal_id>`. <service_id> must be the id of a valid and active ATLAS service"
       },
-      "SimpleError": {
-        "type": "string",
-        "description": "Plain text message (may be empty).",
-        "example": "optional error message"
-      },
       "DetailedError": {
         "type": "object",
         "description": "This defines the structure of an error payload when one is present. Actual messages and additional error information content may change from one implementation to another",
@@ -367,6 +336,16 @@
           "message": {
             "type": "string",
             "description": "error description"
+          },
+          "status": {
+            "type": "string",
+            "format": "number",
+            "description": "http error code"
+          },
+          "error_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "A service's proprietary UI url where the user may navigate to view additional information or be prompted for additional actions to deal with the error. A well-behaved FMIS will present his users with a visual indication and the means to click on this link when this attribute is present."
           },
           "errors": {
             "type": "array",
@@ -380,11 +359,9 @@
           "message"
         ],
         "example": {
-          "message": "general error message",
+          "message": "this is a sample error message",
           "errors": [
-            "optional",
-            "additional",
-            "details"
+            "this is an example of additional error information"
           ]
         }
       }
